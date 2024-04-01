@@ -79,13 +79,25 @@ function App() {
         rs = rs.substring(1);
       }
 
-      return (
-        opcode +
-        decToBin(rd, 4) +
-        decToBin(rs, 4) +
-        "0000" +
-        decToBin(immediate, 16)
-      );
+      let result;
+
+      if (parts[0] === "addi") {
+        result =
+          opcode +
+          decToBin(rd, 4) +
+          "0000" +
+          decToBin(rs, 4) +
+          decToBin(immediate, 16);
+      } else {
+        result =
+          opcode +
+          decToBin(rd, 4) +
+          decToBin(rs, 4) +
+          "0000" +
+          decToBin(immediate, 16);
+      }
+
+      return result;
     } else if (opcode === "1011") {
       // Format J
       const address = decToBin(parts[1], 16);
