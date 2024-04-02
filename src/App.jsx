@@ -133,7 +133,7 @@ function App() {
         return "0111";
       case "sw":
         return "1000";
-      case "bne":
+      case "blt":
         return "1001";
       case "ori":
         return "1010";
