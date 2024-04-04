@@ -4,7 +4,7 @@ function App() {
   const [assemblySrc, setAssemblySrc] = useState("");
   const [resultCode, setResultCode] = useState("");
   const [format, setFormat] = useState("Hex");
-  const [version, setVersion] = useState("Deluxe");
+  const [bubbles, setBubbles] = useState(true);
 
   /**
    *
@@ -162,6 +162,76 @@ function App() {
     return hexadecimal;
   }
 
+  function getInstructionFromCode(code) {
+    const instructionMap = {
+      "0000": "add",
+      "0001": "sub",
+      "0010": "mul",
+      "0011": "sll",
+      "0100": "or",
+      "0101": "slt",
+      "0110": "addi",
+      "0111": "lw",
+      1000: "sw",
+      1001: "blt",
+      1010: "ori",
+      1011: "j",
+    };
+
+    return instructionMap[code] || null;
+  }
+
+  function isBubbleAfterRequired(instruction) {
+    const bubbleInstructions = {
+      j: [true, 1],
+      blt: [true, 2],
+    };
+
+    return bubbleInstructions[instruction] || [false, -1];
+  }
+
+  function isBubbleBeforeRequired(instruction) {
+    return [
+      "add",
+      "sub",
+      "mul",
+      "sll",
+      "or",
+      "slt",
+      "lw",
+      "sw",
+      "blt",
+    ].includes(instruction);
+  }
+
+  function addBubbles(binInstructions) {
+    let result = [];
+    const bubble = "00000000000000000000000000000000";
+    const BUBBLE_COUNT = 3;
+
+    binInstructions.forEach((bin) => {
+      const instructionCode = bin.slice(0, 4);
+      const instruction = getInstructionFromCode(instructionCode);
+
+      if (isBubbleBeforeRequired(instruction)) {
+        for (let i = 0; i < BUBBLE_COUNT; i++) {
+          result.push(bubble);
+        }
+      }
+
+      result.push(bin);
+
+      const [isRequiredAfter, bubbleCount] = isBubbleAfterRequired(instruction);
+      if (isRequiredAfter) {
+        for (let i = 0; i < bubbleCount; i++) {
+          result.push(bubble);
+        }
+      }
+    });
+
+    return result;
+  }
+
   /**
    *
    * @param {FormDataEvent} e
@@ -170,17 +240,22 @@ function App() {
     e.preventDefault();
     const assemblyLines = assemblySrc.split("\n").map((line) => line.trim());
     const resultBin = assembleAll(assemblyLines);
+
+    const resultBinWithBubbles = bubbles && addBubbles(resultBin);
+
     const resultHex = resultBin.map((line) => binaryToHex(line));
-    if (format === "Hex") {
+
+    const resultHexWithBubbles =
+      bubbles && resultBinWithBubbles.map((line) => binaryToHex(line));
+
+    if (format === "Hex" && bubbles) {
+      setResultCode(resultHexWithBubbles.toString().replaceAll(",", " "));
+    } else if (format === "Hex" && !bubbles) {
       setResultCode(resultHex.toString().replaceAll(",", " "));
+    } else if (bubbles) {
+      setResultCode(resultBinWithBubbles.toString().replaceAll(",", " "));
     } else {
       setResultCode(resultBin.toString().replaceAll(",", " "));
-    }
-
-    if (version === "Deluxe") {
-
-    } else {
-
     }
   }
 
@@ -204,14 +279,16 @@ function App() {
                   <option>Hex</option>
                   <option>Bin</option>
                 </select>
-                <select
-                  name="version"
-                  value={version}
-                  onChange={(e) => setVersion(e.target.value)}
-                >
-                  <option>Deluxe</option>
-                  <option>Classic</option>
-                </select>
+                <div className="flex gap-2">
+                  <input
+                    type="checkbox"
+                    name="bubbles"
+                    id="bubblues"
+                    checked={bubbles}
+                    onChange={() => setBubbles(!bubbles)}
+                  />
+                  <label htmlFor="bubbles">Bubbles</label>
+                </div>
                 <button
                   className="ring-offset-background focus-visible:ring-ring bg-primary text-primary-foreground hover:bg-primary/90 inline-flex h-10 items-center justify-center whitespace-nowrap rounded-md bg-green-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-green-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50"
                   type="submit"
