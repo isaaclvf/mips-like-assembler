@@ -81,11 +81,18 @@ function App() {
 
       let result;
 
-      if (parts[0] === "addi" || parts[0] === "lw" || parts[0] === "sw") {
+      if (parts[0] === "addi" || parts[0] === "lw") {
         result =
           opcode +
           decToBin(rd, 4) +
           "0000" +
+          decToBin(rs, 4) +
+          decToBin(immediate, 16);
+      } else if (parts[0] === "sw") {
+        result =
+          opcode +
+          "0000" +
+          decToBin(rd, 4) +
           decToBin(rs, 4) +
           decToBin(immediate, 16);
       } else if (parts[0] === "blt") {
