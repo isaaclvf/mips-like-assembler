@@ -4,6 +4,7 @@ function App() {
   const [assemblySrc, setAssemblySrc] = useState("");
   const [resultCode, setResultCode] = useState("");
   const [format, setFormat] = useState("Hex");
+  const [version, setVersion] = useState("Deluxe");
 
   /**
    *
@@ -81,18 +82,11 @@ function App() {
 
       let result;
 
-      if (parts[0] === "addi" || parts[0] === "lw") {
+      if (parts[0] === "addi" || parts[0] === "lw" || parts[0] === "sw") {
         result =
           opcode +
           decToBin(rd, 4) +
           "0000" +
-          decToBin(rs, 4) +
-          decToBin(immediate, 16);
-      } else if (parts[0] === "sw") {
-        result =
-          opcode +
-          "0000" +
-          decToBin(rd, 4) +
           decToBin(rs, 4) +
           decToBin(immediate, 16);
       } else if (parts[0] === "blt") {
@@ -182,6 +176,12 @@ function App() {
     } else {
       setResultCode(resultBin.toString().replaceAll(",", " "));
     }
+
+    if (version === "Deluxe") {
+
+    } else {
+
+    }
   }
 
   return (
@@ -203,6 +203,14 @@ function App() {
                 >
                   <option>Hex</option>
                   <option>Bin</option>
+                </select>
+                <select
+                  name="version"
+                  value={version}
+                  onChange={(e) => setVersion(e.target.value)}
+                >
+                  <option>Deluxe</option>
+                  <option>Classic</option>
                 </select>
                 <button
                   className="ring-offset-background focus-visible:ring-ring bg-primary text-primary-foreground hover:bg-primary/90 inline-flex h-10 items-center justify-center whitespace-nowrap rounded-md bg-green-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-green-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50"
