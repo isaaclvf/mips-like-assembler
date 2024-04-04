@@ -172,10 +172,10 @@ function App() {
       "0101": "slt",
       "0110": "addi",
       "0111": "lw",
-      1000: "sw",
-      1001: "blt",
-      1010: "ori",
-      1011: "j",
+      "1000": "sw",
+      "1001": "blt",
+      "1010": "ori",
+      "1011": "j",
     };
 
     return instructionMap[code] || null;
@@ -207,23 +207,24 @@ function App() {
   function addBubbles(binInstructions) {
     let result = [];
     const bubble = "00000000000000000000000000000000";
-    const BUBBLE_COUNT = 3;
+    // const BUBBLE_COUNT = 3;
+    const tmp = 5;
 
     binInstructions.forEach((bin) => {
       const instructionCode = bin.slice(0, 4);
       const instruction = getInstructionFromCode(instructionCode);
 
       if (isBubbleBeforeRequired(instruction)) {
-        for (let i = 0; i < BUBBLE_COUNT; i++) {
+        for (let i = 0; i < tmp; i++) {
           result.push(bubble);
         }
       }
 
       result.push(bin);
 
-      const [isRequiredAfter, bubbleCount] = isBubbleAfterRequired(instruction);
+      const [isRequiredAfter, _] = isBubbleAfterRequired(instruction);
       if (isRequiredAfter) {
-        for (let i = 0; i < bubbleCount; i++) {
+        for (let i = 0; i < tmp; i++) {
           result.push(bubble);
         }
       }
@@ -305,11 +306,12 @@ function App() {
                     Enter assembly code
                   </label>
                   <textarea
-                    className="border-input bg-background ring-offset-background placeholder:text-muted-foreground focus-visible:ring-ring flex min-h-[200px] w-full rounded-md border px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 md:w-[50ch]"
+                    className="border-input bg-background ring-offset-background placeholder:text-muted-foreground focus-visible:ring-ring flex min-h-[200px] h-fit w-full rounded-md border px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 md:w-[50ch]"
                     id="text"
                     placeholder="Enter your text"
                     value={assemblySrc}
                     onChange={(e) => setAssemblySrc(e.target.value)}
+                    spellCheck={false}
                   ></textarea>
                 </div>
                 <div className="space-y-2">
@@ -317,7 +319,7 @@ function App() {
                     Result
                   </label>
                   <textarea
-                    className="border-input bg-background ring-offset-background placeholder:text-muted-foreground focus-visible:ring-ring flex min-h-[200px] w-full cursor-not-allowed rounded-md border px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 md:w-[50ch]"
+                    className="border-input bg-background ring-offset-background placeholder:text-muted-foreground focus-visible:ring-ring flex min-h-[200px] h-fit w-full cursor-not-allowed rounded-md border px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 md:w-[50ch]"
                     id="result"
                     placeholder="Result"
                     readOnly
